@@ -7,8 +7,8 @@ from datadog import initialize, api
 class DatadogClient:
     def __init__(self) -> None:
         # Seconds to pretend that we're in the past
-        self.latency = 65
-        self.query_frequency = 60
+        self.latency = 125
+        self.query_frequency = 120
 
         api_key = os.environ.get('DATADOG_API_KEY', None)
         app_key = os.environ.get('DATADOG_APP_KEY', None)
@@ -20,6 +20,7 @@ class DatadogClient:
 
         initialize(**options)
         self.query = 'sum:spring.counter.multi_item_cart.order_placed{run_mode:4real}.as_count()'
+        # self.query = 'sum:aws.elb.request_count{name:sfe-4real-elb}.as_count()'
 
         self.last_query_time = time.time() - self.latency
         self.orders = []
@@ -45,7 +46,7 @@ class DatadogClient:
             if order[0] / 1000 <= delayed_now:
                 print("Orders: " + str(order[1]) + " (" + str(order[0]) + ")")
                 for i in range(0, int(order[1])):
-                    times += [1000, 500]
+                    times += [1, 0.5]
                 self.orders.pop(0)
             else:
                 break

@@ -1,12 +1,13 @@
+import argparse
 import atexit
 import time
 import urllib
 
-from datadog_client import DatadogClient
 from pager_duty_client import PagerDutyClient
-from raspberry_pi import RaspberryPi
+from datadog_client import DatadogClient
+from output import OutputService
 
-pi = RaspberryPi()
+pi = None
 
 red_light = 11  # GPIO 17
 green_led = 15  # GPIO 15
@@ -18,6 +19,18 @@ def exit_handler():
 
 
 def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--test', action='store_true', help='If flag is '
+                        'present, does not run geocode lookup.')
+    params = parser.parse_args()
+
+    if not params.test:
+        time.sleep(5)
+
+    global pi  # pylint: disable=global-statement
+    pi = OutputService(params.test)
+
     # We should wait for the wifi to connect to a network
     block_until_connected_to_network()
 
@@ -40,15 +53,15 @@ def main():
         datadog.run()
         times = datadog.get_light_times()
         state = True
-        GPIO.output(green_led, GPIO.HIGH)
+        pi.on(green_led)
         for t in times:
             state = not state
             if state:
-                GPIO.output(green_led, GPIO.HIGH)
+                pi.on(green_led)
             else:
-                GPIO.output(green_led, GPIO.LOW)
+                pi.off(green_led)
             time.sleep(t)
-        GPIO.output(green_led, GPIO.LOW)
+        pi.off(green_led)
 
         # To prevent from using 100% cpu
         time.sleep(0.1)

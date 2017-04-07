@@ -70,7 +70,7 @@ class PagerDutyClient:
 
     def light_should_be_on(self):
         return self.has_triggered_alerts_for_service(
-            service_ids=['PNNRR6Q'], verbose=True)
+            service_ids=['PNNRR6Q'])
 
 
 # {

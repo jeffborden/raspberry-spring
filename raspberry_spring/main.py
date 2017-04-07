@@ -1,28 +1,29 @@
-import time
-
-from raspberry_pi import RaspberryPi
-from pager_duty_client import PagerDutyClient
-from datadog_client import DatadogClient
-
 import atexit
+import time
+import urllib
 
+from datadog_client import DatadogClient
+from pager_duty_client import PagerDutyClient
+from raspberry_pi import RaspberryPi
 
 pi = RaspberryPi()
+
+red_light = 11  # GPIO 17
+green_led = 15  # GPIO 15
+red_led = 31  # GPIO 6
+
 
 def exit_handler():
     pi.clean_up()
 
+
 def main():
-    # Letting wifi connect
-    time.sleep(30)
+    # We should wait for the wifi to connect to a network
+    block_until_connected_to_network()
 
     pager_duty = PagerDutyClient()
     datadog = DatadogClient()
     atexit.register(exit_handler)
-
-    red_light = 11      # GPIO 17
-    green_led = 15      # GPIO 15
-    red_led = 31        # GPIO 6
 
     last_pager_duty_update = int(time.time())
     pager_duty_update_frequency = 60
@@ -51,6 +52,23 @@ def main():
 
         # To prevent from using 100% cpu
         time.sleep(0.1)
+
+
+def block_until_connected_to_network():
+    # Letting wifi connect
+    light_on = False
+    while True:
+        try:
+            urllib.request.urlopen("http://google.com")
+            break
+        except urllib.error.URLError as e:
+            print("Couldn't connect to Network" + e.reason)
+            pi.on(red_light)
+            light_on = True
+        time.sleep(5)
+    if light_on:
+        pi.off(red_light)
+
 
 if __name__ == '__main__':
     main()

@@ -11,8 +11,10 @@ import atexit
 def exit_handler():
     pi.clean_up()
 
+def main()
 
-if __name__ == '__main__':
+    time.sleep(5)
+
     pi = RaspberryPi()
     pager_duty = PagerDutyClient()
     datadog = DatadogClient()
@@ -49,3 +51,5 @@ if __name__ == '__main__':
 
         time.sleep(0.1)
 
+if __name__ == '__main__':
+    main()

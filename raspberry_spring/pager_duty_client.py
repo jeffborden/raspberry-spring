@@ -1,9 +1,9 @@
+
 import logging
 import os
 
 import requests
-
-
+        
 class PagerDutyClient:
     def __init__(self) -> None:
         auth_token = os.environ.get('PAGERDUTY_API_KEY', None)
@@ -12,6 +12,10 @@ class PagerDutyClient:
             "Authorization": "Token token=" + auth_token,
         }
 
+    def light_should_be_on(self):
+        # TODO fill this in
+        return True
+        
     def get_pager_duty_alerts(self, **kwargs):
         if 'verbose' in kwargs:
             logging.basicConfig(level=logging.DEBUG)
@@ -25,6 +29,7 @@ class PagerDutyClient:
         if response:
             try:
                 json_response = response.json()
+                # print(response.text)
                 return json_response
             except:
                 if 'verbose' in kwargs:
@@ -65,30 +70,3 @@ class PagerDutyClient:
                 else:
                     hist[status] = 1
         return hist
-
-
-client = PagerDutyClient()
-print(
-    client.get_outstanding_pager_duty_alerts_for_service(
-        service_id='P5QQOOM', verbose=True))
-
-# {
-#     'Catalog-Eng': 'PUZRE98',
-#     'cloudwatch': 'PSP00LK',
-#     'Datadog - Elasticsearch - Low': 'P3T3EJY',
-#     'Datadog - High Urgency': 'P5QQOOM',
-#     'Datadog - ETL Engineer Sev 2': 'P9KVWRC',
-#     'DataDog App Support Engineer Sev 2': 'P4FD9EE',
-#     'Datadog - Email Scraper Engineer Sev 3': 'PFII32W',
-#     'Datadog - Low Urgency': 'PNNRR6Q',
-#     'Datadog - BMV3 Engineer Sev 2': 'PDB1NGR',
-#     'Datadog - App Support Engineer Sev 1': 'PZDS807',
-#     'Merchandising': 'PINBL01',
-#     'Pingdom': 'PROVYJV',
-#     'Calypso-Fire': 'PRM0123',
-#     'Datadog - ETL Engineer Sev 1': 'P0K47QZ',
-#     'graylog': 'PZRWW4Q',
-#     'Team urgency': 'P73W5N8',
-#     'Datadog - Elasticsearch - High': 'PZ851UT',
-#     'Datadog - Bmv3 Engineer Sev 1': 'P804Y3X'
-# }

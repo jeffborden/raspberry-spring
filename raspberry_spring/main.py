@@ -1,20 +1,30 @@
+import argparse
+import atexit
 import time
 
-from raspberry_pi import RaspberryPi
 from pager_duty_client import PagerDutyClient
 from datadog_client import DatadogClient
+from output import OutputService
 
-import atexit
+pi = None
 
-
-pi = RaspberryPi()
 
 def exit_handler():
     pi.clean_up()
 
 def main():
 
-    time.sleep(5)
+    global pi  # pylint: disable=global-statement
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--test', action='store_true', help='If flag is '
+                        'present, does not run geocode lookup.')
+    params = parser.parse_args()
+
+    if not params.test:
+        time.sleep(5)
+
+    pi = OutputService(params.test)
 
     pager_duty = PagerDutyClient()
     datadog = DatadogClient()
@@ -39,15 +49,15 @@ def main():
         datadog.run()
         times = datadog.get_light_times()
         state = True
-        GPIO.output(green_led, GPIO.HIGH)
+        pi.on(green_led)
         for t in times:
             state = not state
             if state:
-                GPIO.output(green_led, GPIO.HIGH)
+                pi.on(green_led)
             else:
-                GPIO.output(green_led, GPIO.LOW)
+                pi.off(green_led)
             time.sleep(t)
-        GPIO.output(green_led, GPIO.LOW)
+        pi.off(green_led)
 
         time.sleep(0.1)
 

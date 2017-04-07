@@ -21,8 +21,8 @@ def exit_handler():
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--test', action='store_true', help='If flag is '
-                        'present, does not run geocode lookup.')
+    parser.add_argument('-t', '--test', action='store_true', help='disabled raspi stuff')
+    parser.add_argument('-d', '--ddtest', action='store_true', help='mocks datadog data')
     params = parser.parse_args()
 
     if not params.test:
@@ -35,7 +35,7 @@ def main():
     block_until_connected_to_network()
 
     pager_duty = PagerDutyClient()
-    datadog = DatadogClient(params.test)
+    datadog = DatadogClient(params.ddtest)
     atexit.register(exit_handler)
 
     last_pager_duty_update = int(time.time())

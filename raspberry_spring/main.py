@@ -7,15 +7,15 @@ from datadog_client import DatadogClient
 import atexit
 
 
+pi = RaspberryPi()
 
 def exit_handler():
     pi.clean_up()
 
-def main()
+def main():
 
     time.sleep(5)
 
-    pi = RaspberryPi()
     pager_duty = PagerDutyClient()
     datadog = DatadogClient()
     atexit.register(exit_handler)

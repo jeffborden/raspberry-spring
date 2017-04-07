@@ -1,7 +1,8 @@
 import argparse
 import atexit
 import time
-import urllib
+import requests
+
 
 from pager_duty_client import PagerDutyClient
 from datadog_client import DatadogClient
@@ -72,9 +73,9 @@ def block_until_connected_to_network():
     light_on = False
     while True:
         try:
-            urllib.request.urlopen("http://shopspring.com")
+            requests.get("http://shopspring.com", timeout=5)
             break
-        except urllib.error.URLError as e:
+        except requests.exceptions.Timeout as e:
             # TODO something with e.reason
             print("Couldn't connect to Network")
             pi.on(red_light)

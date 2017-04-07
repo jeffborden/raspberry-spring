@@ -70,7 +70,7 @@ def block_until_connected_to_network():
     light_on = False
     while True:
         try:
-            urllib.request.urlopen("http://google.com")
+            urllib.request.urlopen("http://shopspring.com")
             break
         except urllib.error.URLError as e:
             print("Couldn't connect to Network" + e.reason)

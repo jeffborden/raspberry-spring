@@ -75,7 +75,8 @@ def block_until_connected_to_network():
             urllib.request.urlopen("http://shopspring.com")
             break
         except urllib.error.URLError as e:
-            print("Couldn't connect to Network" + e.reason)
+            # TODO something with e.reason
+            print("Couldn't connect to Network")
             pi.on(red_light)
             light_on = True
         time.sleep(5)

@@ -35,7 +35,7 @@ def main():
     block_until_connected_to_network()
 
     pager_duty = PagerDutyClient()
-    datadog = DatadogClient()
+    datadog = DatadogClient(params.test)
     atexit.register(exit_handler)
 
     last_pager_duty_update = int(time.time())

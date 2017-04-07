@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 
-class RaspberryPi:
+class RaspberryPiDriver:
     def __init__(self):
         # Use Raspberry Pi board pin number scheme
         GPIO.setmode(GPIO.BOARD)

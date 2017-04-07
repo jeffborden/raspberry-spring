@@ -1,12 +1,13 @@
+import argparse
 import atexit
 import time
 import urllib
 
-from datadog_client import DatadogClient
 from pager_duty_client import PagerDutyClient
-from raspberry_pi import RaspberryPi
+from datadog_client import DatadogClient
+from output import OutputService
 
-pi = RaspberryPi()
+pi = None
 
 red_light = 11  # GPIO 17
 green_led = 15  # GPIO 15
@@ -18,15 +19,27 @@ def exit_handler():
 
 
 def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--test', action='store_true', help='disabled raspi stuff')
+    parser.add_argument('-d', '--ddtest', action='store_true', help='mocks datadog data')
+    params = parser.parse_args()
+
+    if not params.test:
+        time.sleep(5)
+
+    global pi  # pylint: disable=global-statement
+    pi = OutputService(params.test)
+
     # We should wait for the wifi to connect to a network
     block_until_connected_to_network()
 
     pager_duty = PagerDutyClient()
-    datadog = DatadogClient()
+    datadog = DatadogClient(params.ddtest)
     atexit.register(exit_handler)
 
     last_pager_duty_update = int(time.time())
-    pager_duty_update_frequency = 60
+    pager_duty_update_frequency = 10
 
     while True:
         now = int(time.time())
@@ -40,15 +53,13 @@ def main():
         datadog.run()
         times = datadog.get_light_times()
         state = True
-        GPIO.output(green_led, GPIO.HIGH)
         for t in times:
-            state = not state
             if state:
-                GPIO.output(green_led, GPIO.HIGH)
+                pi.on(green_led)
             else:
-                GPIO.output(green_led, GPIO.LOW)
+                pi.off(green_led)
+            state = not state
             time.sleep(t)
-        GPIO.output(green_led, GPIO.LOW)
 
         # To prevent from using 100% cpu
         time.sleep(0.1)
@@ -59,7 +70,7 @@ def block_until_connected_to_network():
     light_on = False
     while True:
         try:
-            urllib.request.urlopen("http://google.com")
+            urllib.request.urlopen("http://shopspring.com")
             break
         except urllib.error.URLError as e:
             print("Couldn't connect to Network" + e.reason)

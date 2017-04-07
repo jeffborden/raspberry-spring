@@ -1,6 +1,5 @@
 import logging
 import os
-from copy import copy
 from typing import List
 
 import requests
@@ -41,14 +40,12 @@ class PagerDutyClient:
             request_data['service_ids[]'] = kwargs['service_ids']
 
         response = requests.get(
-            endpoint_url, headers=self.common_headers, data=request_data)
+            endpoint_url,
+            headers=self.common_headers,
+            data=request_data,
+            timeout=30.0)
         if response:
-            try:
-                json_response = response.json()
-                return json_response
-            except:
-                if 'verbose' in kwargs and kwargs['verbose']:
-                    print("Couldn't parse response: " + response)
+            return response.json()
         else:
             if 'verbose' in kwargs and kwargs['verbose']:
                 print("DIDN'T GET A RESPONSE")
@@ -57,6 +54,13 @@ class PagerDutyClient:
     def has_triggered_alerts_for_service(self,
                                          service_ids: List[str],
                                          **kwargs):
+        """
+        Returns a boolean indicating if any of the supplied service_ids have incidents of status 'triggered'
+         
+        :param service_ids: 
+        :param kwargs: 
+        :return: True if incidents of status 'triggered' exist for the supplied service ids
+        """
         pagerduty_response = self.get_pager_duty_alerts(
             service_ids=service_ids, statuses=['triggered'], **kwargs)
         if pagerduty_response is not None and pagerduty_response.get(
@@ -65,12 +69,9 @@ class PagerDutyClient:
         return False
 
     def light_should_be_on(self):
-        # TODO fill this in
-        return True
+        return self.has_triggered_alerts_for_service(
+            service_ids=['PNNRR6Q'], verbose=True)
 
-
-# client = PagerDutyClient()
-# client.has_triggered_alerts_for_service(service_ids=['PNNRR6Q'], verbose=True)
 
 # {
 #     'Catalog-Eng': 'PUZRE98',

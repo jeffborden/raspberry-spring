@@ -37,7 +37,7 @@ class PagerDutyClient:
             endpoint_url = 'https://api.pagerduty.com/incidents'
 
         request_data = {
-            'assigned_to_user': 'PS3RKJG'
+            'assigned_to_user': ['PS3RKJG']     # this doesn't do anything
         }
         if 'statuses' in kwargs:
             request_data['statuses[]'] = kwargs['statuses']
@@ -70,10 +70,13 @@ class PagerDutyClient:
             service_ids=service_ids, statuses=['triggered'], **kwargs)
         if pagerduty_response is not None and pagerduty_response.get(
                 'incidents') is not None:
-            be_on = len(pagerduty_response.get('incidents')) > 0
-            import pdb
-            pdb.set_trace()
-            return be_on
+
+            # hack for hackathon demo
+            for incident in pagerduty_response.get('incidents'):
+                for assignment in incident['assignments']:
+                    if assignment['assignee']['id'] == 'PS3RKJG':
+                        return True
+
         return False
 
     def light_should_be_on(self):

@@ -36,7 +36,9 @@ class PagerDutyClient:
         else:
             endpoint_url = 'https://api.pagerduty.com/incidents'
 
-        request_data = {}
+        request_data = {
+            'assigned_to_user': 'P8YZESI'
+        }
         if 'statuses' in kwargs:
             request_data['statuses[]'] = kwargs['statuses']
         if 'service_ids' in kwargs:
@@ -75,7 +77,10 @@ class PagerDutyClient:
         return self.has_triggered_alerts_for_service(
             service_ids=['PNNRR6Q'])
 
+client = PagerDutyClient()
+print(client.get_pager_duty_alerts(service_ids=['PNNRR6Q'], statuses=['triggered', 'acknowledged']))
 
+# assigned_to_user='P8YZESI'
 # {
 #     'Catalog-Eng': 'PUZRE98',
 #     'cloudwatch': 'PSP00LK',

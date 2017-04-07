@@ -13,8 +13,8 @@ def exit_handler():
     pi.clean_up()
 
 def main():
-
-    time.sleep(5)
+    # Letting wifi connect
+    time.sleep(30)
 
     pager_duty = PagerDutyClient()
     datadog = DatadogClient()
@@ -49,6 +49,7 @@ def main():
             time.sleep(t)
         GPIO.output(green_led, GPIO.LOW)
 
+        # To prevent from using 100% cpu
         time.sleep(0.1)
 
 if __name__ == '__main__':

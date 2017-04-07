@@ -70,7 +70,10 @@ class PagerDutyClient:
             service_ids=service_ids, statuses=['triggered'], **kwargs)
         if pagerduty_response is not None and pagerduty_response.get(
                 'incidents') is not None:
-            return len(pagerduty_response.get('incidents')) > 0
+            be_on = len(pagerduty_response.get('incidents')) > 0
+            import pdb
+            pdb.set_trace()
+            return be_on
         return False
 
     def light_should_be_on(self):

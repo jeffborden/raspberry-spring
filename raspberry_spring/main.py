@@ -1,6 +1,7 @@
 import argparse
 import atexit
 import time
+import urllib
 
 from pager_duty_client import PagerDutyClient
 from datadog_client import DatadogClient
@@ -8,13 +9,16 @@ from output import OutputService
 
 pi = None
 
+red_light = 11  # GPIO 17
+green_led = 15  # GPIO 15
+red_led = 31  # GPIO 6
+
 
 def exit_handler():
     pi.clean_up()
 
-def main():
 
-    global pi  # pylint: disable=global-statement
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--test', action='store_true', help='If flag is '
@@ -24,15 +28,15 @@ def main():
     if not params.test:
         time.sleep(5)
 
+    global pi  # pylint: disable=global-statement
     pi = OutputService(params.test)
+
+    # We should wait for the wifi to connect to a network
+    block_until_connected_to_network()
 
     pager_duty = PagerDutyClient()
     datadog = DatadogClient()
     atexit.register(exit_handler)
-
-    red_light = 11      # GPIO 17
-    green_led = 15      # GPIO 15
-    red_led = 31        # GPIO 6
 
     last_pager_duty_update = int(time.time())
     pager_duty_update_frequency = 60
@@ -59,7 +63,25 @@ def main():
             time.sleep(t)
         pi.off(green_led)
 
+        # To prevent from using 100% cpu
         time.sleep(0.1)
+
+
+def block_until_connected_to_network():
+    # Letting wifi connect
+    light_on = False
+    while True:
+        try:
+            urllib.request.urlopen("http://google.com")
+            break
+        except urllib.error.URLError as e:
+            print("Couldn't connect to Network" + e.reason)
+            pi.on(red_light)
+            light_on = True
+        time.sleep(5)
+    if light_on:
+        pi.off(red_light)
+
 
 if __name__ == '__main__':
     main()

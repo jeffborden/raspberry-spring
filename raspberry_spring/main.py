@@ -39,7 +39,7 @@ def main():
     atexit.register(exit_handler)
 
     last_pager_duty_update = int(time.time())
-    pager_duty_update_frequency = 60
+    pager_duty_update_frequency = 10
 
     while True:
         now = int(time.time())
@@ -53,15 +53,13 @@ def main():
         datadog.run()
         times = datadog.get_light_times()
         state = True
-        pi.on(green_led)
         for t in times:
-            state = not state
             if state:
                 pi.on(green_led)
             else:
                 pi.off(green_led)
+            state = not state
             time.sleep(t)
-        pi.off(green_led)
 
         # To prevent from using 100% cpu
         time.sleep(0.1)

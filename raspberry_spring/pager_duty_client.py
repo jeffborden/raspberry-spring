@@ -37,7 +37,7 @@ class PagerDutyClient:
             endpoint_url = 'https://api.pagerduty.com/incidents'
 
         request_data = {
-            'assigned_to_user': 'P8YZESI'
+            'assigned_to_user': 'PS3RKJG'
         }
         if 'statuses' in kwargs:
             request_data['statuses[]'] = kwargs['statuses']

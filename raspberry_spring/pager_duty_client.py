@@ -8,6 +8,9 @@ import requests
 class PagerDutyClient:
     def __init__(self) -> None:
         auth_token = os.environ.get('PAGERDUTY_API_KEY', None)
+        if not auth_token:
+            raise Exception("No PAGERDUTY_API_KEY was defined")
+
         self.common_headers = {
             "Accept": "application/vnd.pagerduty+json;version=2",
             "Authorization": "Token token=" + auth_token,

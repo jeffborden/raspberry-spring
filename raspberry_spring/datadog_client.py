@@ -25,6 +25,8 @@ class DatadogClient:
         self.latency = 125
         self.query_frequency = 120
 
+        self.since_black_friday = 136 * 24 * 60 * 60
+
         api_key = os.environ.get('DATADOG_API_KEY', None)
         app_key = os.environ.get('DATADOG_APP_KEY', None)
 
@@ -37,7 +39,7 @@ class DatadogClient:
         self.query = 'sum:spring.counter.multi_item_cart.order_placed{run_mode:4real}.as_count()'
         # self.query = 'sum:aws.elb.request_count{name:sfe-4real-elb}.as_count()'
 
-        self.last_query_time = time.time() - self.latency
+        self.last_query_time = self.now() - self.latency
         self.orders = []  # type: List
 
         if test:
@@ -46,7 +48,8 @@ class DatadogClient:
 
 
     def get_orders(self) -> bool:
-        now = time.time()
+        now = self.now()
+        print("Making Datadog request")
         result = api.Metric.query(start=int(self.last_query_time), end=int(now), query=self.query)
 
         if result['status'] != 'ok':
@@ -60,22 +63,25 @@ class DatadogClient:
 
     def get_light_times(self) -> List[float]:
 
-        delayed_now = time.time() - self.latency
+        delayed_now = self.now() - self.latency
         times = []  # type: List[float]
         while len(self.orders) > 0:
             order = self.orders[0]
             if order[0] / 1000 <= delayed_now:
                 print("Orders: " + str(order[1]) + " (" + str(order[0]) + ")")
                 for _ in range(0, int(order[1])):
-                    times += [1.0, 0.5]
+                    times += [0.5, 0.25]
                 self.orders.pop(0)
             else:
                 break
         return times
 
     def run(self) -> None:
-        if self.last_query_time + self.query_frequency < float(time.time()):
+        if self.last_query_time + self.query_frequency < self.now():
             self.get_orders()
+
+    def now(self) -> float:
+        return float(time.time() - self.since_black_friday)
 
 
 if __name__ == "__main__":

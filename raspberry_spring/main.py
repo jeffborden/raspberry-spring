@@ -5,7 +5,7 @@ import requests
 
 
 from pager_duty_client import PagerDutyClient
-# from datadog_client import DatadogClient
+from datadog_client import DatadogClient
 from output import OutputService
 
 pi = None
@@ -36,7 +36,7 @@ def main():
     block_until_connected_to_network()
 
     pager_duty = PagerDutyClient()
-    # datadog = DatadogClient(params.ddtest)
+    datadog = DatadogClient(params.ddtest)
     atexit.register(exit_handler)
 
     last_pager_duty_update = int(time.time())
@@ -51,16 +51,16 @@ def main():
                 pi.off(red_light)
             last_pager_duty_update = now
 
-        # datadog.run()
-        # times = datadog.get_light_times()
-        # state = True
-        # for t in times:
-        #     if state:
-        #         pi.on(green_led)
-        #     else:
-        #         pi.off(green_led)
-        #     state = not state
-        #     time.sleep(t)
+        datadog.run()
+        times = datadog.get_light_times()
+        state = True
+        for t in times:
+            if state:
+                pi.on(green_led)
+            else:
+                pi.off(green_led)
+            state = not state
+            time.sleep(t)
 
         # To prevent from using 100% cpu
         time.sleep(0.1)

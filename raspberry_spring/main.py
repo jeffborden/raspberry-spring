@@ -73,7 +73,7 @@ def block_until_connected_to_network():
         try:
             requests.get("http://shopspring.com", timeout=5)
             break
-        except requests.exceptions.Timeout as e:
+        except (requests.exceptions.Timeout,requests.exceptions.ConnectionError) as e:
             # TODO something with e.reason
             print("Couldn't connect to Network")
             pi.on(red_light)

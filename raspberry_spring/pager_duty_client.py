@@ -50,7 +50,7 @@ class PagerDutyClient:
                 headers=self.common_headers,
                 data=request_data,
                 timeout=30.0)
-        except requests.exceptions.Timeout:
+        except Exception:
             if 'verbose' in kwargs and kwargs['verbose']:
                 print("Pagerduty timeout")
             return None

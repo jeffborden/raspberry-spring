@@ -11,8 +11,8 @@ from output import OutputService
 pi = None
 
 red_light = 11  # GPIO 17
-green_led = 15  # GPIO 15
-red_led = 31  # GPIO 6
+green_led = 15  # GPIO 22
+red_led = 31    # GPIO 6
 
 
 def exit_handler():
@@ -76,11 +76,11 @@ def block_until_connected_to_network():
         except (requests.exceptions.Timeout,requests.exceptions.ConnectionError) as e:
             # TODO something with e.reason
             print("Couldn't connect to Network")
-            pi.on(red_light)
+            pi.on(red_led)
             light_on = True
         time.sleep(5)
     if light_on:
-        pi.off(red_light)
+        pi.off(red_led)
 
 
 if __name__ == '__main__':

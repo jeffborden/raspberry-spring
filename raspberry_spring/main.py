@@ -40,7 +40,7 @@ def main():
     atexit.register(exit_handler)
 
     last_pager_duty_update = int(time.time())
-    pager_duty_update_frequency = 10
+    pager_duty_update_frequency = 30
 
     while True:
         now = int(time.time())

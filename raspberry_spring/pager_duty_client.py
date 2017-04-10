@@ -44,11 +44,17 @@ class PagerDutyClient:
         if 'service_ids' in kwargs:
             request_data['service_ids[]'] = kwargs['service_ids']
 
-        response = requests.get(
-            endpoint_url,
-            headers=self.common_headers,
-            data=request_data,
-            timeout=30.0)
+        try:
+            response = requests.get(
+                endpoint_url,
+                headers=self.common_headers,
+                data=request_data,
+                timeout=30.0)
+        except requests.exceptions.Timeout:
+            if 'verbose' in kwargs and kwargs['verbose']:
+                print("Pagerduty timeout")
+            return None
+            
         if response:
             return response.json()
         else:
